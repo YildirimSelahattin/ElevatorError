@@ -1,0 +1,40 @@
+{
+"elevatorArray":[
+    {
+        "gridHeight":4,
+        "gridWidth":3,
+        "totalFloor":4,
+        "peopleList":[
+            {
+            "characterName":"fox",
+            "positionIndexList":[0],
+            "whichFloor":1
+            },
+            {
+            "characterName":"mice",
+            "positionIndexList":[3],
+            "whichFloor":2
+            },
+            {
+            "characterName":"hoodie",
+            "positionIndexList":[6],
+            "whichFloor":4
+            }
+         ],
+         "boardingPeopleList":[
+         {
+            "characterName":"mice",
+            "positionIndexList":[1],
+            "whichFloor":1,
+            "whichFloorToBoard":1
+            },
+            {
+            "characterName":"hoodie",
+            "positionIndexList":[0],
+            "whichFloor":1,
+            "whichFloorToBoard":1
+            }
+         ]
+    }
+]
+}
