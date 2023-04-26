@@ -33,7 +33,7 @@ public class GameManager : MonoBehaviour
     public Material arrowShiningMat;
 
     public CinemachineVirtualCamera camera;
-
+    private bool isShaken;
     private float Shaketime;
     // Start is called before the first frame update
     void Start()
@@ -48,15 +48,20 @@ public class GameManager : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (Shaketime > 0 )
-        {
-            Shaketime -= Time.deltaTime;
-            if (Shaketime <= 0f)
+      
+            
+            if (Shaketime > 0 )
             {
-                CinemachineBasicMultiChannelPerlin shake = camera.GetCinemachineComponent<CinemachineBasicMultiChannelPerlin>();
-                shake.m_AmplitudeGain = 0f;
+                
+                Shaketime -= Time.deltaTime;
+                if (Shaketime <= 0f)
+                {
+                    CinemachineBasicMultiChannelPerlin shake = camera.GetCinemachineComponent<CinemachineBasicMultiChannelPerlin>();
+                    shake.m_AmplitudeGain = 0f;
+                }
             }
-        }
+        
+        
         if (shouldCount == true)
         {
 
@@ -96,7 +101,9 @@ public class GameManager : MonoBehaviour
 
     public void MoveOneFloorUp()
     {
-        ShakeCamera(.2f,2f);
+        
+        camera.transform.DOMove(new Vector3(camera.transform.position.x, camera.transform.position.y - 1f, camera.transform.position.z + 1f),1f);
+
         ShineLoop(arrowShiningMat);
         SpawnFloorPeople(nextFloorObject);
         currentFloorObject.transform.DOMoveY(startNextFloorFallingPos.position.y, 1f).SetEase(Ease.Linear).OnComplete(() =>
@@ -123,12 +130,12 @@ public class GameManager : MonoBehaviour
                 {
                     
                     arrowShiningMat.DOKill();
-                    arrowShiningMat.DOFade(0,0.1F); 
-                    camera.transform.DOMove(new Vector3(camera.transform.position.x,camera.transform.position.y+1f,camera.transform.position.z-1f),1f).OnComplete((
-                        () =>
-                        {
-                            camera.transform.DOMove(new Vector3(camera.transform.position.x, camera.transform.position.y - 1f, camera.transform.position.z + 1f),1f);
-                        }));
+                    arrowShiningMat.DOFade(0,0.1F);
+                    camera.transform.DOMove(
+                        new Vector3(camera.transform.position.x, camera.transform.position.y + 1f,
+                            camera.transform.position.z - 1f), 1f);
+                
+                    
                     //open the doors 
                     doorObject.GetComponent<DoorManager>().leftDoor.transform.DOLocalMoveX(15, 1f);
                     doorObject.GetComponent<DoorManager>().rightDoor.transform.DOLocalMoveX(-15, 1f).OnComplete(() =>
@@ -142,6 +149,7 @@ public class GameManager : MonoBehaviour
 
                         //start counting
                         shouldCount = true;
+                        
                     });
                 }
                 else
