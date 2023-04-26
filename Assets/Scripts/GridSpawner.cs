@@ -42,7 +42,6 @@ public class GridSpawner : MonoBehaviour
 
     public void StartGame(int levelArrayIndex)
     {
-        levelArrayIndex--;
         float distanceBetweenX = Mathf.Abs(leftLimit.transform.position.x - rightLimit.transform.position.x);
         float distanceBetweenY = Mathf.Abs(topLimit.transform.position.z - botLimit.transform.position.z);
         xSize = (distanceBetweenX / GameDataManager.Instance.data.elevatorArray[levelArrayIndex].gridWidth);
