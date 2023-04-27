@@ -20,7 +20,6 @@ public class StoreUIManager : MonoBehaviour
     public int gridWidth;
     public Sprite emptyCircle;
     public Sprite filledCircle;
-    public bool[] isBuyedArray;
     public GameObject rewardEarnedPanel;
     public string[] nameArray;
     public static StoreUIManager Instance;
@@ -69,11 +68,23 @@ public class StoreUIManager : MonoBehaviour
             page.transform.localPosition = new Vector3(gridWidth * gridCounter,0 , 0);
             page.GetComponent<PageManager>().mainImage.sprite = animalImagesArray[pageCounter];
             page.GetComponent<PageManager>().mainImage.preserveAspect= true;
-            page.GetComponent<PageManager>().priceText.text = buyPricesArray[pageCounter].ToString();
+
+            if (GameDataManager.Instance.isBuyedList[pageCounter] == 1)//buyed
+            {
+                page.GetComponent<PageManager>().buyedImage.SetActive(true);
+                page.GetComponent<PageManager>().buyButton.SetActive(false);
+                page.GetComponent<PageManager>().priceTag.SetActive(false);
+            }
+            else//not buyed
+            {
+                page.GetComponent<PageManager>().buyedImage.SetActive(false);
+                page.GetComponent<PageManager>().buyButton.SetActive(true);
+                page.GetComponent<PageManager>().priceTag.SetActive(true);
+                page.GetComponent<PageManager>().priceText.text = buyPricesArray[pageCounter].ToString();
+            }
             pageList.Add(page);
             gridCounter++;
         }
-        
     }
 
     public void SlideRight()
@@ -97,7 +108,7 @@ public class StoreUIManager : MonoBehaviour
 
     public void BuyAnimalOnThePage()
     {
-        isBuyedArray[currentPageIndex] = true;
+        GameDataManager.Instance.isBuyedList[currentPageIndex] = 1;
         rewardEarnedPanel.GetComponent<EarnedPanelManager>().nameText.text = nameArray[currentPageIndex];
         rewardEarnedPanel.GetComponent<EarnedPanelManager>().mainImage.sprite = earnedAnimalImagesArray[currentPageIndex];
         rewardEarnedPanel.SetActive(true);

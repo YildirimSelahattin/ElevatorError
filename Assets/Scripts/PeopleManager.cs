@@ -344,6 +344,7 @@ public class PeopleManager : MonoBehaviour
             happyEmoji.SetActive(true);
             transform.DOKill();
             GameManager.Instance.currentFloorObject.GetComponent<FloorManager>().floorPeopleList.Remove(gameObject);
+            GridSpawner.Instance.elevatorPeopleList.Add(gameObject);
             int wantedIndex = GridSpawner.Instance.gridWidth * (GridSpawner.Instance.gridHeight - 1) + peopleData.positionIndexList[0];
             Debug.Log("youCanGo");
             Vector3 originalLocalPos = transform.localPosition;

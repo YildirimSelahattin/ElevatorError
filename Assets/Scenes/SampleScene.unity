@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 705507994}
-  m_IndirectSpecularColor: {r: 0.18275605, g: 0.22846286, b: 0.30705142, a: 1}
+  m_IndirectSpecularColor: {r: 0.18086308, g: 0.2264031, b: 0.30721754, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -2411,14 +2411,14 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 705507993}
-  m_LocalRotation: {x: 0.32683623, y: -0.08244953, z: 0.20882003, w: 0.91802746}
+  m_LocalRotation: {x: 0.40111443, y: -0.06502428, z: 0.21488501, w: 0.88808984}
   m_LocalPosition: {x: 1.72, y: 9.97, z: -6.23}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 10
-  m_LocalEulerAnglesHint: {x: 39.385, y: -1.103, z: 25.235}
+  m_LocalEulerAnglesHint: {x: 47.765, y: 4.855, z: 29.355}
 --- !u!1 &713177079
 GameObject:
   m_ObjectHideFlags: 0
@@ -3401,7 +3401,6 @@ MonoBehaviour:
   gridWidth: 1200
   emptyCircle: {fileID: 21300000, guid: d67a6030f8f997247bd70f4ef2bfc249, type: 3}
   filledCircle: {fileID: 21300000, guid: ee76fee264892e5479e57f1747b00a56, type: 3}
-  isBuyedArray: 00000000000000
   rewardEarnedPanel: {fileID: 1714101406}
   nameArray:
   - fox
@@ -3857,6 +3856,7 @@ MonoBehaviour:
     elevatorArray: []
   JSONText: {fileID: 4900000, guid: 68809275c7f525a4fb21d75de3548542, type: 3}
   currentLevel: 1
+  isBuyedList: 
 --- !u!4 &1308687907
 Transform:
   m_ObjectHideFlags: 0

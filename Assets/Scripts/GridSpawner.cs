@@ -83,61 +83,79 @@ public class GridSpawner : MonoBehaviour
             int characterIndex = 0;
             switch (peopleData.characterName)
             {
-                case "fox":
+                case "bear":
                     characterIndex = 0;
                     break;
-                case "mice":
+                case "foxAndMom":
                     characterIndex = 1;
                     break;
                 case "hoodie":
                     characterIndex = 2;
                     break;
-                case "bear":
+                case "mice":
                     characterIndex = 3;
                     break;
-                case "giraffe":
+                case "fox":
                     characterIndex = 4;
                     break;
-                case "foxAndMom":
+                case "bearAndMom":
                     characterIndex = 5;
                     break;
-                case "bearAndMom":
+                case "giraffe":
                     characterIndex = 6;
                     break;
             }
-
-            if (peopleData.positionIndexList.Count == 1)
+            if (GameDataManager.Instance.isBuyedList[characterIndex] == 0)//not buyed yet
             {
-                GameObject temp = Instantiate(peopleArray[characterIndex], gridList[peopleData.positionIndexList[0]].transform);
-                temp.GetComponent<PeopleManager>().peopleData = peopleData;
-                temp.GetComponent<PeopleManager>().peopleIndex= 1;
-                temp.GetComponent<PeopleManager>().onElevator= false;
-                temp.name = temp.name + peopleCounter.ToString();
-                temp.GetComponent<PeopleManager>().floorText.text = peopleData.whichFloor.ToString();
-                elevatorPeopleList.Add(temp);
-                for (int i = 0; i < peopleData.positionIndexList.Count; i++)
+                if(characterIndex != 5)
                 {
-                    gridIsEmptyList[peopleData.positionIndexList[i]] = 1;
-                    gridList[i].GetComponent<GridManager>().isEmpty = false;
+                    characterIndex = 1;
                 }
+                else
+                {
+                    characterIndex =  GetRandomCharacterIndex();
+                }
+            }
+            GameObject temp = Instantiate(peopleArray[characterIndex], gridList[peopleData.positionIndexList[0]].transform);
+            temp.GetComponent<PeopleManager>().peopleData = peopleData;
+            temp.GetComponent<PeopleManager>().onElevator = false;
+            temp.GetComponent<PeopleManager>().floorText.text = peopleData.whichFloor.ToString();
+            elevatorPeopleList.Add(temp);
+            temp.name = temp.name + peopleCounter.ToString();
+
+            for (int i = 0; i < peopleData.positionIndexList.Count; i++)
+            {
+                gridIsEmptyList[peopleData.positionIndexList[i]] = 1;
+                gridList[i].GetComponent<GridManager>().isEmpty = false;
             }
             if (peopleData.positionIndexList.Count == 2)
             {
-                GameObject temp = Instantiate(peopleArray[characterIndex], gridList[peopleData.positionIndexList[0]].transform);
-                temp.GetComponent<PeopleManager>().peopleData = peopleData;
-                temp.GetComponent<PeopleManager>().peopleIndex = 1;
-                temp.GetComponent<PeopleManager>().floorText.text = peopleData.whichFloor.ToString();
                 Vector3 pos = temp.transform.localPosition;
                 temp.transform.localPosition = new Vector3(pos.x + xSize / 2, pos.y, pos.z);
-                elevatorPeopleList.Add(temp);
-                for (int i = 0; i < peopleData.positionIndexList.Count; i++)
-                {
-                    gridIsEmptyList[peopleData.positionIndexList[i]] =1;
-                    gridList[i].GetComponent<GridManager>().isEmpty = false;
-                }
             }
             
             
+        }
+    }
+
+    public int GetRandomCharacterIndex()
+    {
+        int startIndex = Random.Range(0,7);
+        while (true)
+        {
+            if(startIndex==1 || startIndex == 5)// two charactered people
+            {
+                startIndex++;
+                continue;
+            }
+            else
+            {
+                startIndex %= 7;
+                if (GameDataManager.Instance.isBuyedList[startIndex] == 1)
+                {
+                    return startIndex;
+                }
+            }
         }
     }
 }

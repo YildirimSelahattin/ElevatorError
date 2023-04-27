@@ -8,6 +8,7 @@ public class PageManager : MonoBehaviour
 {
     public Image mainImage;
     public TextMeshProUGUI priceText;
+    public GameObject priceTag;
     public GameObject buyButton;
     public GameObject buyedImage;
 
