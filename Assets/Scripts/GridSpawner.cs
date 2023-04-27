@@ -24,6 +24,7 @@ public class GridSpawner : MonoBehaviour
     public List<GameObject> elevatorPeopleList;
     public GameObject[] floors;
 
+
     void Start()
     {
         if (Instance == null)

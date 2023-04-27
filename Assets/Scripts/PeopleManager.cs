@@ -49,14 +49,6 @@ public class PeopleManager : MonoBehaviour
                 {
                     GridSpawner.Instance.gridIsEmptyList[gridNumber] = 0;
                 }
-                if (GetRowIndex(peopleData.positionIndexList[0]) == GridSpawner.Instance.gridHeight-1)//if the people is on the last row
-                {
-                    // make the wating people go in;
-                    foreach (GameObject people in GameManager.Instance.currentFloorObject.GetComponent<FloorManager>().floorPeopleList)
-                    {
-                        people.GetComponent<PeopleManager>().GoInElevator();
-                    }
-                }
                 gameObject.layer = LayerMask.NameToLayer("Default");
                 Vector3 originalLocalPos = transform.localPosition;
                 transform.parent = GridSpawner.Instance.gridList[gridIndex - 1].transform;
@@ -70,7 +62,6 @@ public class PeopleManager : MonoBehaviour
                     peopleData.positionIndexList[i]--;
                     GridSpawner.Instance.gridIsEmptyList[peopleData.positionIndexList[i]] = 1;
                 }
-                
             }
             else
             {
@@ -108,14 +99,7 @@ public class PeopleManager : MonoBehaviour
                 {
                     GridSpawner.Instance.gridIsEmptyList[gridNumber] = 0;
                 }
-                if (GetRowIndex(peopleData.positionIndexList[0]) == GridSpawner.Instance.gridHeight - 1)//if the people is on the last row
-                {
-                    // make the wating people go in;
-                    foreach (GameObject people in GameManager.Instance.currentFloorObject.GetComponent<FloorManager>().floorPeopleList)
-                    {
-                        people.GetComponent<PeopleManager>().GoInElevator();
-                    }
-                }
+              
                 gameObject.layer = LayerMask.NameToLayer("Default");
                 Vector3 originalLocalPos = transform.localPosition;
                 transform.parent = GridSpawner.Instance.gridList[peopleData.positionIndexList[0] + 1].transform;
@@ -165,14 +149,7 @@ public class PeopleManager : MonoBehaviour
                 {
                     GridSpawner.Instance.gridIsEmptyList[gridNumber] = 0;
                 }
-                if (GetRowIndex(peopleData.positionIndexList[0]) == GridSpawner.Instance.gridHeight - 1)//if the people is on the last row
-                {
-                    // make the wating people go in;
-                    foreach (GameObject people in GameManager.Instance.currentFloorObject.GetComponent<FloorManager>().floorPeopleList)
-                    {
-                        people.GetComponent<PeopleManager>().GoInElevator();
-                    }
-                }
+                
                 gameObject.layer = LayerMask.NameToLayer("Default");
                 Vector3 originalLocalPos = transform.localPosition;
                 transform.parent = GridSpawner.Instance.gridList[targetIndex].transform;
@@ -218,6 +195,7 @@ public class PeopleManager : MonoBehaviour
     }
     public void MoveBackward()
     {
+        Debug.Log("geriGitlA");
         int rowIndex = GetRowIndex(peopleData.positionIndexList[0]);
         int columnIndex = GetColumnIndex(peopleData.positionIndexList[0]);
         if (rowIndex != 0)
@@ -231,14 +209,7 @@ public class PeopleManager : MonoBehaviour
                 {
                     GridSpawner.Instance.gridIsEmptyList[gridNumber] = 0;
                 }
-                if (GetRowIndex(peopleData.positionIndexList[0]) == GridSpawner.Instance.gridHeight - 1)//if the people is on the last row
-                {
-                    // make the wating people go in;
-                    foreach (GameObject people in GameManager.Instance.currentFloorObject.GetComponent<FloorManager>().floorPeopleList)
-                    {
-                        people.GetComponent<PeopleManager>().GoInElevator();
-                    }
-                }
+                
                 gameObject.layer = LayerMask.NameToLayer("Default");
                 Vector3 originalLocalPos = transform.localPosition;
                 transform.parent = GridSpawner.Instance.gridList[targetIndex].transform;
@@ -354,9 +325,22 @@ public class PeopleManager : MonoBehaviour
     }
     public void GoInElevator()
     {
+
         int rowIndex = GridSpawner.Instance.gridHeight;
         int columnIndex =peopleData.positionIndexList[0];
-        if(IsRowEmpty(columnIndex, rowIndex, "up")){
+        bool canGoIn = false;
+
+        if (LookForColumn(rowIndex, columnIndex) == true){
+            canGoIn = true;
+        }
+        else if (LookForRightLeft(rowIndex,columnIndex))//now look for lateral and 
+        {
+            LookForColumn(rowIndex, columnIndex);
+            canGoIn = true;
+        }
+        if(canGoIn = true)
+        {
+            //now go in floor people 
             happyEmoji.SetActive(true);
             transform.DOKill();
             GameManager.Instance.currentFloorObject.GetComponent<FloorManager>().floorPeopleList.Remove(gameObject);
@@ -370,19 +354,14 @@ public class PeopleManager : MonoBehaviour
             transform.DOLocalMoveZ(originalLocalPos.z, moveTime).SetEase(Ease.Linear).OnComplete(() =>
             {
                 gameObject.layer = LayerMask.NameToLayer("People");
-                peopleObject.transform.DOLocalRotate(new Vector3(0,180,0),0.5f);
+                peopleObject.transform.DOLocalRotate(new Vector3(0, 180, 0), 0.5f);
             });
             for (int i = 0; i < peopleData.positionIndexList.Count; i++)
             {
-                peopleData.positionIndexList[i] = wantedIndex+i;
+                peopleData.positionIndexList[i] = wantedIndex + i;
                 GridSpawner.Instance.gridIsEmptyList[peopleData.positionIndexList[i]] = 1;
             }
         }
-        else
-        {
-            angerEmoji.SetActive(true);
-        }
-        
     }
 
     public IEnumerator BlinkEyes(GameObject eye)
@@ -395,7 +374,7 @@ public class PeopleManager : MonoBehaviour
         StartCoroutine(BlinkEyes(eye)); 
     }
 
-
+    
 
     public IEnumerator HeadTiltLeftRight(GameObject head)
     {
@@ -416,5 +395,57 @@ public class PeopleManager : MonoBehaviour
             }
         }
         return true;
+    }
+
+    public bool LookForColumn(int rowIndex,int columnIndex)
+    {
+        //FÝRST LOOK FOR ROW OPENÝNGS
+        for (int tempRowIndex = rowIndex; tempRowIndex > 0; tempRowIndex--)
+        {
+           
+            if (IsRowEmpty(columnIndex, tempRowIndex, "up"))
+            {
+                for (int i = tempRowIndex; i < GridSpawner.Instance.gridHeight; i++)
+                {
+                    Debug.Log((i) * GridSpawner.Instance.gridWidth + columnIndex+"heay" + tempRowIndex);
+                    GameObject people = GridSpawner.Instance.gridList[(i) * GridSpawner.Instance.gridWidth + columnIndex].transform.GetChild(0).gameObject;
+                    Debug.Log(people.name);
+                    people.GetComponent<PeopleManager>().MoveBackward();
+                }
+                return true;
+            }
+        }
+        return false;
+    }
+    public bool LookForRightLeft(int rowIndex,int columnIndex)
+    {
+        //FÝRST LOOK FOR LEFT
+        
+        for ( int tempRowIndex = rowIndex; rowIndex > 0; rowIndex--)
+        {
+            columnIndex = peopleData.positionIndexList[0];
+            if (columnIndex > 0 ) // may go left
+            {
+                int currentIndex = tempRowIndex * GridSpawner.Instance.gridWidth+ columnIndex;
+
+                if (GridSpawner.Instance.gridIsEmptyList[tempRowIndex*GridSpawner.Instance.gridWidth + columnIndex+1] == 0)
+                {
+                    GridSpawner.Instance.gridList[currentIndex].GetComponent<PeopleManager>().MoveLeft();
+                    return true;
+                }
+            }
+            columnIndex = peopleData.positionIndexList[peopleData.positionIndexList.Count-1];
+            if (columnIndex < GridSpawner.Instance.gridWidth)
+            {
+                int currentIndex = tempRowIndex * GridSpawner.Instance.gridWidth + columnIndex;
+
+                if (GridSpawner.Instance.gridIsEmptyList[tempRowIndex * GridSpawner.Instance.gridWidth + columnIndex+1] == 0)
+                {
+                    GridSpawner.Instance.gridList[currentIndex].GetComponent<PeopleManager>().MoveLeft();
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 }
