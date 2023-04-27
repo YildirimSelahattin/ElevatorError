@@ -101,7 +101,7 @@ public class GameManager : MonoBehaviour
 
     public void MoveOneFloorUp()
     {
-        
+        ScrollingBG.breake = 1;
         camera.transform.DOMove(new Vector3(camera.transform.position.x, camera.transform.position.y - 1f, camera.transform.position.z + 1f),1f);
 
         ShineLoop(arrowShiningMat);
@@ -135,7 +135,7 @@ public class GameManager : MonoBehaviour
                         new Vector3(camera.transform.position.x, camera.transform.position.y + 1f,
                             camera.transform.position.z - 1f), 1f);
                 
-                    
+                    ScrollingBG.breake = 0;
                     //open the doors 
                     doorObject.GetComponent<DoorManager>().leftDoor.transform.DOLocalMoveX(15, 1f);
                     doorObject.GetComponent<DoorManager>().rightDoor.transform.DOLocalMoveX(-15, 1f).OnComplete(() =>
