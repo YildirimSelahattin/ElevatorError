@@ -16,6 +16,7 @@ public class StartScreenSize : MonoBehaviour
         if (_width > 1450)
         {
             _Canvas.GetComponent<CanvasScaler>().matchWidthOrHeight = 1;
+            _Canvas.GetComponent<CanvasScaler>().referenceResolution = new Vector2(1080,2200);
             startScreenImage.sprite = ipadImage;
         }
     }

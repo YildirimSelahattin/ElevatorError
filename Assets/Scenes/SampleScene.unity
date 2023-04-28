@@ -3215,7 +3215,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 881665843}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -4.63, y: -0.4365353, z: 5.4316936}
+  m_LocalPosition: {x: -4.63, y: -0.7, z: 5.4316936}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -3341,7 +3341,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _Canvas: {fileID: 898154227}
   startScreenImage: {fileID: 1004456716}
-  ipadImage: {fileID: 21300000, guid: 47872de1b097cc94e861368551b50657, type: 3}
+  ipadImage: {fileID: 21300000, guid: b70734e26c207d0429acbcf2b323fb84, type: 3}
 --- !u!1 &963194225
 GameObject:
   m_ObjectHideFlags: 0
@@ -3811,7 +3811,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1118698988}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -4.64, y: -0.26, z: 5.451693}
+  m_LocalPosition: {x: -4.64, y: -0.7, z: 5.451693}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -4886,7 +4886,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1467746385}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 2.81, y: -0.4365353, z: 5.4316936}
+  m_LocalPosition: {x: 2.81, y: -0.7, z: 5.4316936}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -5451,7 +5451,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1615765825}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 2.9, y: -0.26, z: 5.451693}
+  m_LocalPosition: {x: 2.9, y: -0.7, z: 5.451693}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
