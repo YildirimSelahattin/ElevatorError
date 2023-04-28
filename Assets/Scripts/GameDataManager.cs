@@ -40,7 +40,7 @@ public class GameDataManager : MonoBehaviour
             }
             else
             {
-                int value = PlayerPrefs.GetInt("IsBuyed", 0);
+                int value = PlayerPrefs.GetInt("IsBuyed", 1);
                 isBuyedList.Add(value);
                 if(value == 1)
                 {
