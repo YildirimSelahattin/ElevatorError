@@ -12,12 +12,14 @@ public class GameDataManager : MonoBehaviour
     public static GameDataManager Instance;
     public int currentLevel;
     public List<int> isBuyedList;
+    public List<int> avaliableCharacterIndexes;
     void Awake()
     {
 
         if(Instance == null)
         {
             Instance = this;
+            DontDestroyOnLoad(this);
         }
         LoadData();
     }
@@ -38,7 +40,12 @@ public class GameDataManager : MonoBehaviour
             }
             else
             {
-                isBuyedList.Add(PlayerPrefs.GetInt("IsBuyed", 0));
+                int value = PlayerPrefs.GetInt("IsBuyed", 0);
+                isBuyedList.Add(value);
+                if(value == 1)
+                {
+                    avaliableCharacterIndexes.Add(i);
+                }
             }
         }
     }

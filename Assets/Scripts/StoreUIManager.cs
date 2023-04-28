@@ -113,6 +113,6 @@ public class StoreUIManager : MonoBehaviour
         rewardEarnedPanel.GetComponent<EarnedPanelManager>().mainImage.sprite = earnedAnimalImagesArray[currentPageIndex];
         rewardEarnedPanel.SetActive(true);
         pageList[currentPageIndex].GetComponent<PageManager>().buyButton.gameObject.SetActive(false);
-        pageList[currentPageIndex].GetComponent<PageManager>().buyedImage.gameObject.SetActive(true);
+        
     }
 }

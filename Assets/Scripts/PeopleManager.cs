@@ -52,7 +52,7 @@ public class PeopleManager : MonoBehaviour
                 gameObject.layer = LayerMask.NameToLayer("Default");
                 Vector3 originalLocalPos = transform.localPosition;
                 transform.parent = GridSpawner.Instance.gridList[gridIndex - 1].transform;
-                MoveShake(moveTime, 0, 4);
+                MoveShake(moveTime, 0,1,"stopAtEnd");
                 transform.DOLocalMoveX(originalLocalPos.x, moveTime).SetEase(Ease.Linear).OnComplete(() =>
                 {
                     gameObject.layer = LayerMask.NameToLayer("People");
@@ -103,7 +103,7 @@ public class PeopleManager : MonoBehaviour
                 gameObject.layer = LayerMask.NameToLayer("Default");
                 Vector3 originalLocalPos = transform.localPosition;
                 transform.parent = GridSpawner.Instance.gridList[peopleData.positionIndexList[0] + 1].transform;
-                MoveShake(moveTime, 0, 4);
+                MoveShake(moveTime, 0, 1, "stopAtEnd");
                 transform.DOLocalMoveX(originalLocalPos.x, moveTime).SetEase(Ease.Linear).OnComplete(() =>
                 {
                     gameObject.layer = LayerMask.NameToLayer("People");
@@ -138,7 +138,7 @@ public class PeopleManager : MonoBehaviour
     {
         int rowIndex = GetRowIndex(peopleData.positionIndexList[0]);
         int columnIndex = GetColumnIndex(peopleData.positionIndexList[0]);
-
+       
         if (rowIndex < GridSpawner.Instance.gridHeight - 1)
         {
             if (IsRowEmpty(columnIndex, rowIndex, "down"))//if it is an empty spot
@@ -153,16 +153,49 @@ public class PeopleManager : MonoBehaviour
                 gameObject.layer = LayerMask.NameToLayer("Default");
                 Vector3 originalLocalPos = transform.localPosition;
                 transform.parent = GridSpawner.Instance.gridList[targetIndex].transform;
-                MoveShake(moveTime, 0, 4);
-                transform.DOLocalMoveZ(originalLocalPos.z, moveTime).SetEase(Ease.Linear).OnComplete(() =>
+                float tempMoveTime;
+                if (IsLeavingPathOpen(GetRowIndex(peopleData.positionIndexList[0]), GetColumnIndex(peopleData.positionIndexList[0])))
                 {
-                    gameObject.layer = LayerMask.NameToLayer("People");
-                });
+                    tempMoveTime = 0.2f;
+                    MoveShake(tempMoveTime, 0, 1, "nonStop");
+                }
+                else
+                {
+                    tempMoveTime = 0.5f;
+                    MoveShake(moveTime, 0, 1, "stopAtEnd");
+                }
                 for (int i = 0; i < peopleData.positionIndexList.Count; i++)
                 {
                     peopleData.positionIndexList[i] += GridSpawner.Instance.gridWidth;
-                    GridSpawner.Instance.gridIsEmptyList[peopleData.positionIndexList[i]] = 1;
                 }
+                transform.DOLocalMoveZ(originalLocalPos.z, tempMoveTime).SetEase(Ease.Linear).OnComplete(() =>
+                {
+                    if (peopleData.whichFloor == GameManager.Instance.currentFloor)//if it is the right floor for this people 
+                    {
+                        if (IsLeavingPathOpen(GetRowIndex(peopleData.positionIndexList[0]), GetColumnIndex(peopleData.positionIndexList[0])))
+                        {
+                            Debug.Log("býoom");
+                            MoveForward();
+                        }
+                        else
+                        {
+                            for (int i = 0; i < peopleData.positionIndexList.Count; i++)
+                            {
+                                GridSpawner.Instance.gridIsEmptyList[peopleData.positionIndexList[i]] = 1;
+
+                            }
+                            gameObject.layer = LayerMask.NameToLayer("People");
+                        }
+                    }
+                    else
+                    {
+                        for (int i = 0; i < peopleData.positionIndexList.Count; i++)
+                        {
+                            GridSpawner.Instance.gridIsEmptyList[peopleData.positionIndexList[i]] = 1;
+                        }
+                        gameObject.layer = LayerMask.NameToLayer("People");
+                    }
+                });
             }
             else
             {
@@ -175,22 +208,18 @@ public class PeopleManager : MonoBehaviour
             }
 
         }
+        else if (peopleData.whichFloor == GameManager.Instance.currentFloor && isFloorEmpty())
+        {
+            LeaveElevator(2);
+        }
         else
         {
-
-            if (GameManager.Instance.currentFloor == peopleData.whichFloor)// if it is the right floor for people 
-            {
-                LeaveElevator();
-            }
-            else
-            {
                 angerEmoji.SetActive(true);
                 gameObject.layer = LayerMask.NameToLayer("Default");
                 transform.DOShakePosition(1f, 0.1f, 3, 0).OnComplete(() =>
                 {
                     gameObject.layer = LayerMask.NameToLayer("People");
                 });
-            }
         }
     }
     public void MoveBackward()
@@ -213,7 +242,7 @@ public class PeopleManager : MonoBehaviour
                 gameObject.layer = LayerMask.NameToLayer("Default");
                 Vector3 originalLocalPos = transform.localPosition;
                 transform.parent = GridSpawner.Instance.gridList[targetIndex].transform;
-                MoveShake(moveTime, 0, 4);
+                MoveShake(moveTime, 0,1, "stopAtEnd");
                 transform.DOLocalMoveZ(originalLocalPos.z, moveTime).SetEase(Ease.Linear).OnComplete(() =>
                 {
                     gameObject.layer = LayerMask.NameToLayer("People");
@@ -277,35 +306,55 @@ public class PeopleManager : MonoBehaviour
         return true;
     }
 
-    public void MoveShake(float moveTime, int shakeCount, int shakeAmount)
+    public void MoveShake(float moveTime, int shakeCount, int shakeAmount,string type)
     {
-        Debug.Log("saas");
         float originalLocalY = transform.localPosition.y;
         float originalLocalX = transform.localPosition.x;
-        transform.DOLocalRotate(new Vector3(0, 0, 0.5f), moveTime / (shakeAmount * 2)).OnComplete(() =>
+        Debug.Log("saas"+moveTime / (shakeAmount * 3));
+        transform.DOLocalRotate(new Vector3(0, 0, 2f), moveTime / (shakeAmount * 3)).OnComplete(() =>
         {
             shakeCount++;
-            transform.DOLocalRotate(new Vector3(0, 0, -0.5f), moveTime / (shakeAmount * 2)).OnComplete(() =>
+            transform.DOLocalRotate(new Vector3(0, 0, -2f), moveTime / (shakeAmount * 3)).OnComplete(() =>
             {
-                if (shakeCount > shakeAmount)
+                if (shakeCount >= shakeAmount)
                 {
-                    transform.DOLocalRotate(Vector3.zero, 1f).OnComplete(() =>
+                    transform.DOLocalRotate(Vector3.zero, moveTime / (shakeAmount * 3)).OnComplete(() =>
                     {
-                        return;
+                    return;
                     });
                 }
-                else
+                if (type == "stopAtEnd")
                 {
-                    shakeCount++;
-
-                    Debug.Log("shakeCount" + shakeCount);
-                    MoveShake(moveTime, shakeCount, 4);
+                    transform.DOLocalRotate(Vector3.zero, moveTime / (shakeAmount * 3)).OnComplete(() =>
+                    {
+                        if (shakeCount >= shakeAmount)
+                        {
+                            return;
+                        }
+                        else
+                        {
+                            MoveShake(moveTime, shakeCount, shakeAmount,"stopAtEnd");
+                        }
+                    });
                 }
+                else if (type == "nonStop")
+                {
+                    if (shakeCount >= shakeAmount)
+                    {
+                        return;
+                    }
+                    else
+                    {
+                        MoveShake(moveTime, shakeCount, shakeAmount,"nonStop");
+                    }
+                }
+                
+               
             });
 
         });
     }
-    public void LeaveElevator()
+    public void LeaveElevator(float time)
     {
         if (isFloorEmpty())//if floor is empty
         {
@@ -318,8 +367,8 @@ public class PeopleManager : MonoBehaviour
             {
                 GridSpawner.Instance.gridIsEmptyList[gridNumber] = 0;
             }
-            transform.DOLocalMoveZ(transform.localPosition.z - 5, 3f);
-            MoveShake(3, 0, 12);
+            transform.DOLocalMoveZ(transform.localPosition.z - 3, time);
+            MoveShake(time, 0,2,"nonStop");
             GridSpawner.Instance.elevatorPeopleList.Remove(gameObject);
         }
     }
@@ -344,14 +393,16 @@ public class PeopleManager : MonoBehaviour
             happyEmoji.SetActive(true);
             transform.DOKill();
             GameManager.Instance.currentFloorObject.GetComponent<FloorManager>().floorPeopleList.Remove(gameObject);
-            GridSpawner.Instance.elevatorPeopleList.Add(gameObject);
             int wantedIndex = GridSpawner.Instance.gridWidth * (GridSpawner.Instance.gridHeight - 1) + peopleData.positionIndexList[0];
+            GameManager.Instance.currentFloorObject.GetComponent<FloorManager>().gridIsEmptyList[peopleData.positionIndexList[0]] = true;
+
             Debug.Log("youCanGo");
             Vector3 originalLocalPos = transform.localPosition;
             transform.parent = GridSpawner.Instance.gridList[wantedIndex].transform;
-            MoveShake(moveTime, 0, 4);
+            MoveShake(moveTime, 0, 1,"stopAtEnd");
             transform.DOLocalMoveX(0, moveTime).SetEase(Ease.Linear);
             GridSpawner.Instance.elevatorPeopleList.Add(gameObject);
+            GameManager.Instance.stopFloorsList.Add(peopleData.whichFloor);
             transform.DOLocalMoveZ(originalLocalPos.z, moveTime).SetEase(Ease.Linear).OnComplete(() =>
             {
                 gameObject.layer = LayerMask.NameToLayer("People");
@@ -362,6 +413,7 @@ public class PeopleManager : MonoBehaviour
                 peopleData.positionIndexList[i] = wantedIndex + i;
                 GridSpawner.Instance.gridIsEmptyList[peopleData.positionIndexList[i]] = 1;
             }
+
         }
     }
 
@@ -448,5 +500,30 @@ public class PeopleManager : MonoBehaviour
             }
         }
         return false;
+    }
+
+    public bool IsLeavingPathOpen(int rowIndex,int columnIndex)
+    {
+        Debug.Log("sa");
+        for (int rowCounter = rowIndex+1;rowCounter<GridSpawner.Instance.gridHeight;rowCounter++)
+        {
+            for(int columnCounter = 0; columnCounter < peopleData.positionIndexList.Count; columnCounter++)
+            {
+                if (GridSpawner.Instance.gridIsEmptyList[rowCounter * GridSpawner.Instance.gridWidth + columnCounter] == 1)
+                {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+    public void WalkLeftInFloor()
+    {
+
+    }
+
+    public void WalkRightInFloor()
+    {
+
     }
 }

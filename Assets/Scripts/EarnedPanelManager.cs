@@ -21,6 +21,8 @@ public class EarnedPanelManager : MonoBehaviour
     }
     public void OnContinueButtonClicked()
     {
+        StoreUIManager.Instance.pageList[StoreUIManager.Instance.currentPageIndex].GetComponent<PageManager>().buyedImage.gameObject.SetActive(true);
         gameObject.SetActive(false);
+
     }
 }

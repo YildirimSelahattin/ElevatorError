@@ -35,12 +35,17 @@ public class GameManager : MonoBehaviour
     public CinemachineVirtualCamera camera;
     private bool isShaken;
     private float Shaketime;
+    public static bool loadLevelDirectly;
     // Start is called before the first frame update
     void Start()
     {
         if (Instance == null)
         {
             Instance = this;
+        }
+        if (loadLevelDirectly)
+        {
+            StartCoroutine(StartAfterDelay());
         }
         //CreateElevatorEnvironment();
     }
@@ -81,7 +86,17 @@ public class GameManager : MonoBehaviour
             }
         }
     }
+    public IEnumerator StartAfterDelay()
+    {
+        yield return new WaitForSeconds(1);
+        ResetFloorTexts();
+        MoveOneFloorUp();
+        for (int i = 0; i < GameDataManager.Instance.data.elevatorArray[GameDataManager.Instance.currentLevel - 1].peopleList.Count; i++)
+        {
+            stopFloorsList.Add(GameDataManager.Instance.data.elevatorArray[GameDataManager.Instance.currentLevel - 1].peopleList[i].whichFloor);
+        }
 
+    }
     public void ShakeCamera(float intensity, float time)
     {
         CinemachineBasicMultiChannelPerlin shake = camera.GetCinemachineComponent<CinemachineBasicMultiChannelPerlin>();
@@ -93,9 +108,9 @@ public class GameManager : MonoBehaviour
         GridSpawner.Instance.StartGame(levelIndex);
         ResetFloorTexts();
         MoveOneFloorUp();
-        for (int i = 0; i<GameDataManager.Instance.data.elevatorArray[levelIndex].peopleList.Count; i++)
+        for (int i = 0; i < GameDataManager.Instance.data.elevatorArray[GameDataManager.Instance.currentLevel - 1].peopleList.Count; i++)
         {
-            stopFloorsList.Add(GameDataManager.Instance.data.elevatorArray[levelIndex].peopleList[i].whichFloor);
+            stopFloorsList.Add(GameDataManager.Instance.data.elevatorArray[GameDataManager.Instance.currentLevel - 1].peopleList[i].whichFloor);
         }
     }
 
@@ -103,7 +118,10 @@ public class GameManager : MonoBehaviour
     {
         ScrollingBG.breake = 1;
         camera.transform.DOMove(new Vector3(camera.transform.position.x, camera.transform.position.y - 1f, camera.transform.position.z + 1f),1f);
-
+        for (int i = 0; i < nextFloorObject.GetComponent<FloorManager>().gridIsEmptyList.Count; i++)
+        {
+            nextFloorObject.GetComponent<FloorManager>().gridIsEmptyList[i] = true;
+        }
         ShineLoop(arrowShiningMat);
         SpawnFloorPeople(nextFloorObject);
         currentFloorObject.transform.DOMoveY(startNextFloorFallingPos.position.y, 1f).SetEase(Ease.Linear).OnComplete(() =>
@@ -189,11 +207,13 @@ public class GameManager : MonoBehaviour
     }
     public void SpawnFloorPeople(GameObject floor)
     {
+
         //clear first
         for (int i = nextFloorObject.GetComponent<FloorManager>().floorPeopleList.Count - 1; i >= 0; i--)
         {
             Destroy(nextFloorObject.GetComponent<FloorManager>().floorPeopleList[i].gameObject);
         }
+        
         nextFloorObject.GetComponent<FloorManager>().floorPeopleList.Clear();
         List<BoardingPeople> boardingPeopleList = GameDataManager.Instance.data.elevatorArray[GameDataManager.Instance.currentLevel-1].boardingPeopleList;
         for (int i = 0; i < boardingPeopleList.Count; i++)
@@ -203,29 +223,40 @@ public class GameManager : MonoBehaviour
                 int characterIndex = 0;
                 switch (boardingPeopleList[i].characterName)
                 {
-                    case "fox":
+                    case "bear":
                         characterIndex = 0;
                         break;
-                    case "mice":
+                    case "foxAndMom":
                         characterIndex = 1;
                         break;
                     case "hoodie":
                         characterIndex = 2;
                         break;
-                    case "bear":
+                    case "mice":
                         characterIndex = 3;
                         break;
-                    case "giraffe":
+                    case "fox":
                         characterIndex = 4;
                         break;
-                    case "foxAndMom":
+                    case "bearAndMom":
                         characterIndex = 5;
                         break;
-                    case "bearAndMom":
+                    case "giraffe":
                         characterIndex = 6;
                         break;
                 }
 
+                if (GameDataManager.Instance.isBuyedList[characterIndex] == 0)//not buyed yet
+                {
+                    if (characterIndex == 5)
+                    {
+                        characterIndex = 1;
+                    }
+                    else
+                    {
+                        characterIndex = GridSpawner.Instance.GetRandomCharacterIndex();
+                    }
+                }
                 if (boardingPeopleList[i].positionIndexList.Count == 1)
                 {
                     GameObject temp = Instantiate(GridSpawner.Instance.peopleArray[characterIndex], floor.GetComponent<FloorManager>().gridList[boardingPeopleList[i].positionIndexList[0]].transform);

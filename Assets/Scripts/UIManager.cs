@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class UIManager : MonoBehaviour
 {
@@ -20,19 +21,23 @@ public class UIManager : MonoBehaviour
         {
             Instance = this;
         }
+        if (GameManager.loadLevelDirectly)
+        {
+            startScreen.SetActive(false);
+            inGameScreen.SetActive(true);
+        }
     }
 
     // Update is called once per frame
     void Update()
     {
-        
+
     }
     public void OnStartButtonClicked()
     {
         startScreen.SetActive(false);
         inGameScreen.SetActive(true);
-        int levelIndex = GameDataManager.Instance.currentLevel-1;
-        GameManager.Instance.StartGame(levelIndex);
+        GameManager.Instance.StartGame(GameDataManager.Instance.currentLevel - 1);
     }
     public void PlayUISound()
     {
@@ -52,6 +57,13 @@ public class UIManager : MonoBehaviour
     public void OnRestartButtonClicked()
     {
         failScreen.SetActive(false);
-
+        GameManager.loadLevelDirectly = true;
+        SceneManager.LoadScene(0);
+    }
+    public void OnNextLevelButtonClicked()
+    {
+        GameDataManager.Instance.currentLevel++;
+        GameManager.loadLevelDirectly = true;
+        SceneManager.LoadScene(0);
     }
 }

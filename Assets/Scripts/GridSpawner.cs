@@ -25,11 +25,16 @@ public class GridSpawner : MonoBehaviour
     public GameObject[] floors;
 
 
+
     void Start()
     {
         if (Instance == null)
         {
             Instance = this;
+        }
+        if (GameManager.loadLevelDirectly)
+        {
+            StartGame(GameDataManager.Instance.currentLevel-1);
         }
 
     }
@@ -107,7 +112,7 @@ public class GridSpawner : MonoBehaviour
             }
             if (GameDataManager.Instance.isBuyedList[characterIndex] == 0)//not buyed yet
             {
-                if(characterIndex != 5)
+                if(characterIndex == 5)
                 {
                     characterIndex = 1;
                 }
@@ -130,6 +135,7 @@ public class GridSpawner : MonoBehaviour
             }
             if (peopleData.positionIndexList.Count == 2)
             {
+                Debug.Log("sa");
                 Vector3 pos = temp.transform.localPosition;
                 temp.transform.localPosition = new Vector3(pos.x + xSize / 2, pos.y, pos.z);
             }
@@ -140,22 +146,6 @@ public class GridSpawner : MonoBehaviour
 
     public int GetRandomCharacterIndex()
     {
-        int startIndex = Random.Range(0,7);
-        while (true)
-        {
-            if(startIndex==1 || startIndex == 5)// two charactered people
-            {
-                startIndex++;
-                continue;
-            }
-            else
-            {
-                startIndex %= 7;
-                if (GameDataManager.Instance.isBuyedList[startIndex] == 1)
-                {
-                    return startIndex;
-                }
-            }
-        }
+        return GameDataManager.Instance.avaliableCharacterIndexes[Random.Range(0, GameDataManager.Instance.avaliableCharacterIndexes.Count)];
     }
 }

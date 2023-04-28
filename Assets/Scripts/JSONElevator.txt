@@ -25,16 +25,55 @@
          {
             "characterName":"mice",
             "positionIndexList":[1],
-            "whichFloor":1,
+            "whichFloor":2,
             "whichFloorToBoard":1
             },
             {
             "characterName":"hoodie",
             "positionIndexList":[0],
-            "whichFloor":1,
-            "whichFloorToBoard":1
+            "whichFloor":3,
+            "whichFloorToBoard":2
+            }
+         ]
+    },
+
+    {
+        "gridHeight":4,
+        "gridWidth":3,
+        "totalFloor":4,
+        "peopleList":[
+            {
+            "characterName":"bear",
+            "positionIndexList":[8],
+            "whichFloor":1
+            },
+            {
+            "characterName":"bear",
+            "positionIndexList":[0],
+            "whichFloor":2
+            },
+            {
+            "characterName":"bear",
+            "positionIndexList":[5],
+            "whichFloor":3
+            }
+         ],
+         "boardingPeopleList":[
+         {
+            "characterName":"mice",
+            "positionIndexList":[2],
+            "whichFloor":4,
+            "whichFloorToBoard":3
+            },
+            {
+            "characterName":"hoodie",
+            "positionIndexList":[0],
+            "whichFloor":3,
+            "whichFloorToBoard":2
             }
          ]
     }
+
+
 ]
 }
