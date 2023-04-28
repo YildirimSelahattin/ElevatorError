@@ -154,7 +154,7 @@ public class PeopleManager : MonoBehaviour
                 Vector3 originalLocalPos = transform.localPosition;
                 transform.parent = GridSpawner.Instance.gridList[targetIndex].transform;
                 float tempMoveTime;
-                if (IsLeavingPathOpen(GetRowIndex(peopleData.positionIndexList[0]), GetColumnIndex(peopleData.positionIndexList[0])))
+                if (IsLeavingPathOpen(GetRowIndex(peopleData.positionIndexList[0]), GetColumnIndex(peopleData.positionIndexList[0])) && GameManager.Instance.currentFloor==peopleData.whichFloor)
                 {
                     tempMoveTime = 0.2f;
                     MoveShake(tempMoveTime, 0, 1, "nonStop");
