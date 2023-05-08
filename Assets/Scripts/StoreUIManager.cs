@@ -62,7 +62,7 @@ public class StoreUIManager : MonoBehaviour
         int gridCounter = 0;
 
 
-        for(int pageCounter = 0; pageCounter < 7; pageCounter++)
+        for(int pageCounter = 0; pageCounter < 8; pageCounter++)
         {
             GameObject page = Instantiate(pagePrefab, pageParent.transform);
             page.transform.localPosition = new Vector3(gridWidth * gridCounter,0 , 0);
@@ -72,6 +72,14 @@ public class StoreUIManager : MonoBehaviour
             if (GameDataManager.Instance.isBuyedList[pageCounter] == 1)//buyed
             {
                 page.GetComponent<PageManager>().buyedImage.SetActive(true);
+                page.GetComponent<PageManager>().buyButton.SetActive(false);
+                page.GetComponent<PageManager>().priceTag.SetActive(false);
+            }
+            else if (pageCounter == 7)
+            {
+
+                page.GetComponent<PageManager>().buyedImage.SetActive(false);
+                page.GetComponent<PageManager>().comingSoonImage.SetActive(true);
                 page.GetComponent<PageManager>().buyButton.SetActive(false);
                 page.GetComponent<PageManager>().priceTag.SetActive(false);
             }

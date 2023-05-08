@@ -13,6 +13,12 @@ public class GameDataManager : MonoBehaviour
     public int currentLevel;
     public List<int> isBuyedList;
     public List<int> avaliableCharacterIndexes;
+    public int playSound = 1;
+    public AudioClip dingSound;
+    public AudioClip[] hummingSounds;
+    public AudioClip UISound;
+    public int randomSpawn;
+    public int playedBefore = 0;
     void Awake()
     {
 
@@ -20,8 +26,12 @@ public class GameDataManager : MonoBehaviour
         {
             Instance = this;
             DontDestroyOnLoad(this);
+            LoadData();
         }
-        LoadData();
+        else
+        {
+            Destroy(this.gameObject);
+        }
     }
 
     // Update is called once per frame
@@ -31,8 +41,11 @@ public class GameDataManager : MonoBehaviour
     }
     public void LoadData()
     {
+        playedBefore = PlayerPrefs.GetInt("PlayedBefore",0);
         data = JsonUtility.FromJson<DataList>(JSONText.text);
-        for(int i = 0; i < 7; i++)
+        currentLevel = PlayerPrefs.GetInt("CurrentLevel",1);
+        randomSpawn = PlayerPrefs.GetInt("RandomSpawn",0);
+        for(int i = 0; i < 8; i++)
         {
             if(i == 0 || i == 1)
             {
@@ -48,5 +61,11 @@ public class GameDataManager : MonoBehaviour
                 }
             }
         }
+    }
+    public void SaveData()
+    {
+       PlayerPrefs.SetInt("CurrentLevel", currentLevel);
+       PlayerPrefs.SetInt("RandomSpawn", randomSpawn);
+       PlayerPrefs.GetInt("PlayedBefore", playedBefore);
     }
 }

@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class GridSpawner : MonoBehaviour
@@ -73,9 +74,6 @@ public class GridSpawner : MonoBehaviour
                 gridList.Add(currGrid);
             }
         }
-
-        
-        
         SpawnPeople(levelIndex);
     }
 
@@ -84,7 +82,9 @@ public class GridSpawner : MonoBehaviour
     {
         for (int peopleCounter = 0; peopleCounter < GameDataManager.Instance.data.elevatorArray[levelIndex].peopleList.Count; peopleCounter++)
         {
-            People peopleData = GameDataManager.Instance.data.elevatorArray[levelIndex].peopleList[peopleCounter];
+
+            People peopleData = GameDataManager.Instance.data.elevatorArray[levelIndex].peopleList[peopleCounter].CloneViaFakeSerialization();
+            
             int characterIndex = 0;
             switch (peopleData.characterName)
             {
@@ -110,17 +110,16 @@ public class GridSpawner : MonoBehaviour
                     characterIndex = 6;
                     break;
             }
-            if (GameDataManager.Instance.isBuyedList[characterIndex] == 0)//not buyed yet
+            if (GameDataManager.Instance.randomSpawn == 1)//not buyed yet
             {
-                if(characterIndex == 5)
+                if(characterIndex != 5)
                 {
-                    characterIndex = 1;
+                    characterIndex = GetRandomCharacterIndex();
                 }
-                else
-                {
-                    characterIndex =  GetRandomCharacterIndex();
-                }
+                
             }
+
+            Debug.Log("asd"+characterIndex);
             GameObject temp = Instantiate(peopleArray[characterIndex], gridList[peopleData.positionIndexList[0]].transform);
             temp.GetComponent<PeopleManager>().peopleData = peopleData;
             temp.GetComponent<PeopleManager>().onElevator = false;
@@ -135,7 +134,6 @@ public class GridSpawner : MonoBehaviour
             }
             if (peopleData.positionIndexList.Count == 2)
             {
-                Debug.Log("sa");
                 Vector3 pos = temp.transform.localPosition;
                 temp.transform.localPosition = new Vector3(pos.x + xSize / 2, pos.y, pos.z);
             }

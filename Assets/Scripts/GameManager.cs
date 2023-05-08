@@ -7,6 +7,7 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.Tilemaps;
 using Cinemachine;
+using Unity.VisualScripting;
 
 public class GameManager : MonoBehaviour
 {
@@ -36,6 +37,10 @@ public class GameManager : MonoBehaviour
     private bool isShaken;
     private float Shaketime;
     public static bool loadLevelDirectly;
+
+    public GameObject leftTargetObject;
+    public GameObject rightTargetObject;
+    public GameObject slider;
     // Start is called before the first frame update
     void Start()
     {
@@ -47,44 +52,40 @@ public class GameManager : MonoBehaviour
         {
             StartCoroutine(StartAfterDelay());
         }
+        ScrollingBG.breake = 0;
         //CreateElevatorEnvironment();
     }
 
     // Update is called once per frame
     void Update()
     {
-      
-            
-            if (Shaketime > 0 )
-            {
-                
-                Shaketime -= Time.deltaTime;
-                if (Shaketime <= 0f)
-                {
-                    CinemachineBasicMultiChannelPerlin shake = camera.GetCinemachineComponent<CinemachineBasicMultiChannelPerlin>();
-                    shake.m_AmplitudeGain = 0f;
-                }
-            }
-        
-        
         if (shouldCount == true)
         {
-
             timeCounter += Time.deltaTime;
+            slider.transform.localScale = new Vector3(1-timeCounter/waitingTime,1,1);
             if (timeCounter > waitingTime)
             {
-                timeCounter = 0;
-                shouldCount = false;
-                doorObject.GetComponent<DoorManager>().leftDoor.transform.DOLocalMoveX(0, 1f);
-                doorObject.GetComponent<DoorManager>().rightDoor.transform.DOLocalMoveX(0, 1f).OnComplete(() =>
-                {
-                    if (ControlGameFinish() != true)
-                    {
-                        MoveOneFloorUp();
-                    }
-                });
+                slider.SetActive(false);
+                slider.transform.localScale = new Vector3(1, 1, 1);
+                ReadToGoUp();
             }
         }
+    }
+    public void ReadToGoUp()
+    {
+        if(shouldCount == false) {
+            return;
+        }
+        timeCounter = 0;
+        shouldCount = false;
+        doorObject.GetComponent<DoorManager>().leftDoor.transform.DOLocalMoveX(0, 1f);
+        doorObject.GetComponent<DoorManager>().rightDoor.transform.DOLocalMoveX(0, 1f).OnComplete(() =>
+        {
+            if (ControlGameFinish() != true)
+            {
+                MoveOneFloorUp();
+            }
+        });
     }
     public IEnumerator StartAfterDelay()
     {
@@ -95,29 +96,44 @@ public class GameManager : MonoBehaviour
         {
             stopFloorsList.Add(GameDataManager.Instance.data.elevatorArray[GameDataManager.Instance.currentLevel - 1].peopleList[i].whichFloor);
         }
+        for (int i = 0; i < GameDataManager.Instance.data.elevatorArray[GameDataManager.Instance.currentLevel - 1].boardingPeopleList.Count; i++)
+        {
+            stopFloorsList.Add(GameDataManager.Instance.data.elevatorArray[GameDataManager.Instance.currentLevel - 1].boardingPeopleList[i].whichFloorToBoard);
+            stopFloorsList.Add(GameDataManager.Instance.data.elevatorArray[GameDataManager.Instance.currentLevel - 1].boardingPeopleList[i].whichFloor);
+        }
 
     }
-    public void ShakeCamera(float intensity, float time)
-    {
-        CinemachineBasicMultiChannelPerlin shake = camera.GetCinemachineComponent<CinemachineBasicMultiChannelPerlin>();
-        shake.m_AmplitudeGain = intensity;
-        Shaketime = time;
-    }
+    /*
+     *     public void ShakeCamera(float intensity, float time)
+        {
+            CinemachineBasicMultiChannelPerlin shake = camera.GetCinemachineComponent<CinemachineBasicMultiChannelPerlin>();
+            shake.m_AmplitudeGain = intensity;
+            Shaketime = time;
+        }*/
     public void StartGame(int levelIndex)
     {
         GridSpawner.Instance.StartGame(levelIndex);
+       
         ResetFloorTexts();
         MoveOneFloorUp();
         for (int i = 0; i < GameDataManager.Instance.data.elevatorArray[GameDataManager.Instance.currentLevel - 1].peopleList.Count; i++)
         {
             stopFloorsList.Add(GameDataManager.Instance.data.elevatorArray[GameDataManager.Instance.currentLevel - 1].peopleList[i].whichFloor);
         }
+        for (int i = 0; i < GameDataManager.Instance.data.elevatorArray[GameDataManager.Instance.currentLevel - 1].boardingPeopleList.Count; i++)
+        {
+            stopFloorsList.Add(GameDataManager.Instance.data.elevatorArray[GameDataManager.Instance.currentLevel - 1].boardingPeopleList[i].whichFloorToBoard);
+            stopFloorsList.Add(GameDataManager.Instance.data.elevatorArray[GameDataManager.Instance.currentLevel - 1].boardingPeopleList[i].whichFloor);
+        }
     }
 
     public void MoveOneFloorUp()
     {
+        slider.SetActive(false);
         ScrollingBG.breake = 1;
-        camera.transform.DOMove(new Vector3(camera.transform.position.x, camera.transform.position.y - 1f, camera.transform.position.z + 1f),1f);
+        camera.transform.DOKill();
+        LightUpWhoShouldAboard();
+        camera.transform.DOMove(new Vector3(camera.transform.position.x, camera.transform.position.y - 1f, camera.transform.position.z + 1f), 1f);
         for (int i = 0; i < nextFloorObject.GetComponent<FloorManager>().gridIsEmptyList.Count; i++)
         {
             nextFloorObject.GetComponent<FloorManager>().gridIsEmptyList[i] = true;
@@ -127,11 +143,11 @@ public class GameManager : MonoBehaviour
         currentFloorObject.transform.DOMoveY(startNextFloorFallingPos.position.y, 1f).SetEase(Ease.Linear).OnComplete(() =>
         {
             //delete people on floor
-            for(int i = nextFloorObject.GetComponent<FloorManager>().PeopleParent.transform.childCount - 1; i >= 0; i--)
+            for (int i = nextFloorObject.GetComponent<FloorManager>().PeopleParent.transform.childCount - 1; i >= 0; i--)
             {
                 Destroy(nextFloorObject.transform.GetChild(i).gameObject);
             }
-            
+
             nextFloorObject.SetActive(true);
             nextFloorObject.transform.DOMoveY(currentFloorPos.position.y, 1f).SetEase(Ease.Linear);
             currentFloorObject.transform.DOMoveY(prevFloorTargetPos.position.y, 1f).SetEase(Ease.Linear).OnComplete(() =>
@@ -144,30 +160,64 @@ public class GameManager : MonoBehaviour
                 nextFloorObject.SetActive(false);
                 currentFloor++;
                 ResetFloorTexts();
+
                 if (stopFloorsList.Contains(currentFloor))
                 {
                     
-                    arrowShiningMat.DOKill();
-                    arrowShiningMat.DOFade(0,0.1F);
+                    slider.transform.localScale = new Vector3(1, 1, 1);
+                    slider.SetActive(true);
+                    if (GameDataManager.Instance.playSound == 1)
+                    {
+                        GameObject sound = new GameObject("sound");
+                        sound.AddComponent<AudioSource>();
+                        sound.GetComponent<AudioSource>().volume = 0.1f;
+                        sound.GetComponent<AudioSource>().PlayOneShot(GameDataManager.Instance.dingSound);
+                        Destroy(sound, GameDataManager.Instance.dingSound.length); // Creates new object, add to it audio source, play sound, destroy this object after playing is done
+                    }
                     camera.transform.DOMove(
-                        new Vector3(camera.transform.position.x, camera.transform.position.y + 1f,
-                            camera.transform.position.z - 1f), 1f);
-                
+        new Vector3(camera.transform.position.x, camera.transform.position.y + 1f,
+            camera.transform.position.z - 1f), 1f);
+                    arrowShiningMat.DOKill();
+                    arrowShiningMat.DOFade(0, 0.1F);
                     ScrollingBG.breake = 0;
                     //open the doors 
                     doorObject.GetComponent<DoorManager>().leftDoor.transform.DOLocalMoveX(15, 1f);
                     doorObject.GetComponent<DoorManager>().rightDoor.transform.DOLocalMoveX(-15, 1f).OnComplete(() =>
                     {
                         //tell people go in elevator
-                        
-                        for (int x = currentFloorObject.GetComponent<FloorManager>().floorPeopleList.Count-1; x>=0;x--)
+
+                        for (int x = currentFloorObject.GetComponent<FloorManager>().floorPeopleList.Count - 1; x >= 0; x--)
                         {
                             currentFloorObject.GetComponent<FloorManager>().floorPeopleList[x].GetComponent<PeopleManager>().GoInElevator();
                         }
 
+                        if(GameDataManager.Instance.playedBefore == 0)
+                        {
+                            if(GameDataManager.Instance.currentLevel == 1)
+                            {
+                                UIManager.Instance.tutorialHand.transform.parent = GridSpawner.Instance.elevatorPeopleList[0].transform;
+                                UIManager.Instance.tutorialHand.SetActive(true);
+                                UIManager.Instance.tutorialHand.GetComponent<TutorialHandManager>().Level1Move();
+                            }
+                            else if (GameDataManager.Instance.currentLevel == 2)
+                            {
+                                UIManager.Instance.tutorialHand.transform.parent = GridSpawner.Instance.elevatorPeopleList[0].transform;
+                                UIManager.Instance.tutorialHand.SetActive(true);
+                                if (currentFloor == 1)
+                                {
+                                    UIManager.Instance.tutorialHand.GetComponent<TutorialHandManager>().Level2Move();
+                                }
+                                else if(currentFloor ==2)
+                                {
+                                    UIManager.Instance.tutorialHand.GetComponent<TutorialHandManager>().Level1Move();
+                                }
+                              
+                                
+                            }
+                            
+                        }
                         //start counting
                         shouldCount = true;
-                        
                     });
                 }
                 else
@@ -195,30 +245,29 @@ public class GameManager : MonoBehaviour
     }
     public void ClearPeopleParent(GameObject floorObject)
     {
-        for(int i = 0; i < floorObject.GetComponent<FloorManager>().PeopleParent.transform.childCount; i++)
+        for (int i = 0; i < floorObject.GetComponent<FloorManager>().PeopleParent.transform.childCount; i++)
         {
-            Destroy(floorObject.GetComponent<FloorManager>().PeopleParent.transform.GetChild(i).gameObject) ;
+            Destroy(floorObject.GetComponent<FloorManager>().PeopleParent.transform.GetChild(i).gameObject);
         }
     }
     public void CreateFloorGrids()
     {
         currentFloorObject.GetComponent<FloorManager>().CreateGrid();
-        nextFloorObject.GetComponent<FloorManager>().CreateGrid();  
+        nextFloorObject.GetComponent<FloorManager>().CreateGrid();
     }
     public void SpawnFloorPeople(GameObject floor)
     {
-
         //clear first
         for (int i = nextFloorObject.GetComponent<FloorManager>().floorPeopleList.Count - 1; i >= 0; i--)
         {
             Destroy(nextFloorObject.GetComponent<FloorManager>().floorPeopleList[i].gameObject);
         }
-        
+
         nextFloorObject.GetComponent<FloorManager>().floorPeopleList.Clear();
-        List<BoardingPeople> boardingPeopleList = GameDataManager.Instance.data.elevatorArray[GameDataManager.Instance.currentLevel-1].boardingPeopleList;
+        List<BoardingPeople> boardingPeopleList = GameDataManager.Instance.data.elevatorArray[GameDataManager.Instance.currentLevel - 1].boardingPeopleList;
         for (int i = 0; i < boardingPeopleList.Count; i++)
         {
-            if (boardingPeopleList[i].whichFloorToBoard == currentFloor+1)
+            if (boardingPeopleList[i].whichFloorToBoard == currentFloor + 1)
             {
                 int characterIndex = 0;
                 switch (boardingPeopleList[i].characterName)
@@ -246,13 +295,9 @@ public class GameManager : MonoBehaviour
                         break;
                 }
 
-                if (GameDataManager.Instance.isBuyedList[characterIndex] == 0)//not buyed yet
+                if (GameDataManager.Instance.randomSpawn == 1)//not buyed yet
                 {
-                    if (characterIndex == 5)
-                    {
-                        characterIndex = 1;
-                    }
-                    else
+                    if (characterIndex != 5)
                     {
                         characterIndex = GridSpawner.Instance.GetRandomCharacterIndex();
                     }
@@ -269,13 +314,13 @@ public class GameManager : MonoBehaviour
                     peopleData.whichFloor = boardingPeopleList[i].whichFloor;
                     peopleData.characterName = boardingPeopleList[i].characterName;
                     peopleData.positionIndexList = boardingPeopleList[i].positionIndexList;
-                    temp.GetComponent<PeopleManager>().peopleData = peopleData;
+                    temp.GetComponent<PeopleManager>().peopleData = peopleData.CloneViaFakeSerialization();
                     temp.GetComponent<PeopleManager>().peopleIndex = 1;
                     temp.layer = LayerMask.NameToLayer("Default");
                     temp.GetComponent<PeopleManager>().floorText.text = peopleData.whichFloor.ToString();
                     for (int y = 0; y < peopleData.positionIndexList.Count; y++)
                     {
-                        floor.GetComponent<FloorManager>().gridIsEmptyList[boardingPeopleList[i].positionIndexList[0]]=false;
+                        floor.GetComponent<FloorManager>().gridIsEmptyList[boardingPeopleList[i].positionIndexList[0]] = false;
                     }
                 }
                 if (boardingPeopleList[i].positionIndexList.Count == 2)
@@ -303,14 +348,18 @@ public class GameManager : MonoBehaviour
             }
         }
     }
-
     public bool ControlGameFinish()
     {
         if (GameDataManager.Instance.data.elevatorArray[GameDataManager.Instance.currentLevel - 1].totalFloor == currentFloor)
         {
-            if (GridSpawner.Instance.elevatorPeopleList.Count == 0 ) //if there is no people left
+            if (GridSpawner.Instance.elevatorPeopleList.Count == 0) //if there is no people left
             {
                 UIManager.Instance.winScreen.SetActive(true);
+                if (GameDataManager.Instance.playedBefore == 0 && GameDataManager.Instance.currentLevel == 2)
+                {
+                    GameDataManager.Instance.playedBefore = 1;
+                    UIManager.Instance.tutorialHand.SetActive(false);
+                }
             }
             else
             {
@@ -319,5 +368,32 @@ public class GameManager : MonoBehaviour
             return true;
         }
         return false;
+    }
+    public bool IsPeopleLeftToGetDown()
+    {
+        foreach (GameObject people in GridSpawner.Instance.elevatorPeopleList)
+        {
+            if (people.GetComponent<PeopleManager>().peopleData.whichFloor == currentFloor)
+            {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    public void LightUpWhoShouldAboard()
+    {
+        int nextFloorIndex = currentFloor + 1;
+        foreach(GameObject people in GridSpawner.Instance.elevatorPeopleList)
+        {
+            if(people.GetComponent<PeopleManager>().peopleData.whichFloor == nextFloorIndex)
+            {
+                people.GetComponent<PeopleManager>().LightUpTextBg();
+            }
+            else
+            {
+                people.GetComponent<PeopleManager>().floorBgInsideImage.DOColor(Color.white,0.2f);
+            }
+        }
     }
 }

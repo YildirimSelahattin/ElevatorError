@@ -39,7 +39,7 @@ public class GettingTouchManager : MonoBehaviour
 
                 if (touchedPeople != null)
                 {
-                    if (Mathf.Abs(curTouchPosition.y - touchStartPos.y) > 100)
+                    if (Mathf.Abs(curTouchPosition.y - touchStartPos.y) > 75)
                     {
                         if (touchStartPos.y > curTouchPosition.y)
                         {
@@ -53,7 +53,7 @@ public class GettingTouchManager : MonoBehaviour
                         }
                         touchedPeople = null;
                     }
-                    else if (Mathf.Abs(curTouchPosition.x - touchStartPos.x) > 100)
+                    else if (Mathf.Abs(curTouchPosition.x - touchStartPos.x) > 75)
                     {
                         if (touchStartPos.x> curTouchPosition.x)
                         {
